@@ -11,69 +11,33 @@
 
 (function($) {
     'use strict';
-    var Tree = {
-        clone: function(node, withChildNode) {
-            if (!withChildNode) {
-                withChildNode = node;
-                node = this;
-            }
+    //@import "lib/BlockBox.js";
+    //@import "lib/InlineBox.js";
+    //@import "lib/Line.js";
+    //@import "lib/Util.js";
 
-            if (!node.isNode) {
-                return null;
-            }
-            if (withChildNode) {
-                var i,l,
-                    newNode = node.clone();
-                for (i=0,l=node.length; i<l; i++) {
-                    if (node[i].isNode) {
-                        newNode.append(node[i].clone(true));
-                    }
-                }
-                return newNode;
-            } else {
-                return Tree.createNode(node.name, node.attr);
-            }
-        },
-        append: function(father, son) {
-            if (!son) {
-                son = father;
-                father = this;
-            }
-            if (!son) {
-                return father;
-            }
-            if (son.parent) {
-                throw 'Node ' + son.name + ' has a parent node!';
-            }
-            father.push(son);
-            son.parent = father;
-            return father;
-        },
-        getDeepestChild: function(node) {
-            var next;
-            while (next = node[node.length-1]) {
-                node = next;
-            }
-            return node;
-        },
-        createNode: function(name, attr) {
-            var n = [];
-            n.isNode = true;
-            n.append = Tree.append;
-            n.clone = Tree.clone;
-            // n.detach = Tree.detach;
-            if (name) {
-                n.name = name;
-            }
-            if (attr) {
-                n.attr = attr;
-            }
-            return n;
-        },
-        createTextNode: function(text) {
-            var textNode = Tree.createNode('#text');
-            textNode.value = text;
-            return textNode;
-        }
+
+
+    /**
+     * parse HTML element to text
+     * @param {object} element
+     * @param {object} option
+     * @return {string} text
+     */
+    function parseHTML(element, option) {
+        
+    }
+
+    /**
+     * API for $('.elements').superText();
+     * @param {object} option
+     * @return {string} text
+     */
+    $.fn.superText = function(option) {
+        var text = '';
+        this.each(function(index, element) {
+            text += parseHTML(element, option);
+        });
+        return text;
     };
 })(jQuery);
