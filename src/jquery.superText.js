@@ -11,11 +11,11 @@
 
 (function($) {
     'use strict';
+    //@import "lib/Util.js";
+    //@import "lib/Box.js";
     //@import "lib/BlockBox.js";
     //@import "lib/InlineBox.js";
     //@import "lib/Line.js";
-    //@import "lib/Util.js";
-
 
 
     /**

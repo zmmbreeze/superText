@@ -1,22 +1,19 @@
 var Line = (function() {
+    'use strict';
     
     function Klass() {
-    	// this.inlines = [];
-    	this.isEmpty = true;
+        this.type = 'line';
     }
 
 
     Klass.createEmptyLine = function() {
-    	return new Klass();
+        return new Klass();
     };
 
-    Klass.prototype.addInline = function(inlineBox) {
-    	if (!this.inlineBoxs) {
-    		this.inlineBoxs = [];
-    	}
+    Klass.prototype.addBox = function(box) {
 
 
-    	return this;
+        return this;
     };
 
     Klass.prototype.toText = function() {
