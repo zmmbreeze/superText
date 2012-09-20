@@ -1,5 +1,6 @@
 /**
- * UBBParser
+ * jquery.superText
+ *
  * @author mzhou / @zhoumm
  * @log 0.1 init
  *
@@ -7,7 +8,7 @@
 
 
 /*jshint undef:true, browser:true, noarg:true, curly:true, regexp:true, newcap:true, trailing:false, noempty:true, regexp:false, strict:true, evil:true, funcscope:true, iterator:true, loopfunc:true, multistr:true, boss:true, eqnull:true, eqeqeq:false, undef:true */
-/*global jQuery:true */
+/*global jQuery:true, BoxFactory:false */
 
 (function($) {
     'use strict';
@@ -16,17 +17,8 @@
     //@import "lib/BlockBox.js";
     //@import "lib/InlineBox.js";
     //@import "lib/Line.js";
+    //@import "lib/BoxFactory.js";
 
-
-    /**
-     * parse HTML element to text
-     * @param {object} element
-     * @param {object} option
-     * @return {string} text
-     */
-    function parseHTML(element, option) {
-        
-    }
 
     /**
      * API for $('.elements').superText();
@@ -36,7 +28,7 @@
     $.fn.superText = function(option) {
         var text = '';
         this.each(function(index, element) {
-            text += parseHTML(element, option);
+            text += BoxFactory.rendBox(element, option);
         });
         return text;
     };

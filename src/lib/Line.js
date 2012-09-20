@@ -1,5 +1,7 @@
 /**
- * Base Box Class
+ * A box corresponding to a line,
+ * also mean a paragraph.
+ *
  * @author mzhou / @zhoumm
  *
  */

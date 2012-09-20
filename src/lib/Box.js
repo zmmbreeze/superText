@@ -1,27 +1,81 @@
 /**
- * Base Box Class
+ * A visual formatting box. It can be of three types:
+ *  1. an inline box
+ *  2. a block box.
+ *  3. a line, also mean a paragraph
+ *
  * @author mzhou / @zhoumm
  *
  */
 
 /*jshint undef:true, browser:true, noarg:true, curly:true, regexp:true, newcap:true, trailing:false, noempty:true, regexp:false, strict:true, evil:true, funcscope:true, iterator:true, loopfunc:true, multistr:true, boss:true, eqnull:true, eqeqeq:false, undef:true */
-/*global jQuery:true */
+/*global jQuery:true, BoxFactory:false */
 
 var Box = (function() {
+    'use strict';
+    var ArrayProtoSlice = Array.prototype.slice;
+
+    /**
+     * wrap supr method
+     *
+     * @param {string} method name
+     * @param {object} Father Father/Father.prototype
+     * @param {object} self context
+     * @param {object} args arguments
+     * @param {function} Func caller
+     * @return {function} wrapped supr method
+     *
+     */
+    function wrapSupr(method, Father, self, args, Func) {
+        if (!Func.cache) {
+            Func.cache = {};
+        }
+        var suprMethod = Father[method];
+        if (!suprMethod || typeof suprMethod !== 'function' ) {
+            throw new Error('supr(): First arg must be function name of Father!');
+        }
+
+        var cache = Func.cache;
+        if (!cache[method]) {
+            cache[method] = function() {
+                return suprMethod.apply(self, ArrayProtoSlice.call(args, 0));
+            };
+        }
+        return cache[method];
+    }
+
     function Klass() {}
 
     Klass.extend = function(Son, _Father) {
         var Father = _Father || this;
         for (var staticMethod in Father) {
-            if (Father.hasOwnProperty(staticMethod) && staticMethod !== 'prototype') {
+            if (Father.hasOwnProperty(staticMethod) && staticMethod !== 'prototype' && staticMethod !== 'supr') {
                 Son[staticMethod] = Father[staticMethod];
             }
         }
         for (var method in Father.prototype) {
-            if (Father.prototype.hasOwnProperty(method)) {
+            if (Father.prototype.hasOwnProperty(method) && method !== 'supr') {
                 Son.prototype[method] = Father.prototype[method];
             }
         }
+        /**
+         * Use this method to call father's method
+         *
+         * @param {string} method name
+         * @return {function}
+         */
+        Son.prototype.supr = function suprProto(method) {
+            return wrapSupr(method, Father.prototype, this, arguments, suprProto);
+        };
+        /**
+         * Use this method to call father's method
+         *
+         * @param {string} method name
+         * @return {function}
+         */
+        Son.supr = function suprStatic(method) {
+            return wrapSupr(method, Father, this, arguments, suprStatic);
+        };
 
         return Son;
     };
@@ -32,7 +86,7 @@ var Box = (function() {
      * @return {boolean}
      */
     Klass.prototype.hasChildBox = function() {
-        return this.boxs && this.boxs.length;
+        return this.boxes && this.boxes.length;
     };
 
     /**
@@ -42,7 +96,7 @@ var Box = (function() {
      */
     Klass.prototype.lastChildBox = function() {
         if (this.hasChildBox()) {
-            return this.boxs && this.boxs[this.boxs.length-1];
+            return this.boxes && this.boxes[this.boxes.length-1];
         }
     };
 
@@ -51,7 +105,12 @@ var Box = (function() {
      * 
      * @return {object}
      */
-    Klass.prototype.addChildBox = function() {
+    Klass.prototype.addChildBox = function(box) {
+        if (!this.boxes) {
+            this.boxes = [];
+        }
+        this.boxes.push(box);
+        box.parent = this;
         return this;
     };
 
@@ -59,10 +118,11 @@ var Box = (function() {
      * do layout for this box:
      *      1. generate text;
      *      2. generate prefix and suffix;
-     * 
+     *
+     * @param {object} option
      * @return {object}
      */
-    Klass.prototype.doLayout = function() {
+    Klass.prototype.doLayout = function(option) {
         return this;
     };
 
@@ -70,35 +130,59 @@ var Box = (function() {
      * do layout for this box and it's children recursively:
      *      1. do children's layout iteratively:
      *          a. make new box;
-     *          b. add new box to this box;
-     *          c. if this child has children, goto 1;
-     *          d. if has no child, do layout for new box and return;
+     *          b. if this child has children, goto 1;
+     *          c. if has no child, do layout for new box;
+     *          d. add new box to this box;
      *      2. do layout for this box and return;
-     * 
+     *
+     * @param {object} option
      * @return {object}
      */
-    Klass.prototype.doLayoutR = function() {
+    Klass.prototype.doLayoutR = function(option) {
         var el, childs, i, l, box;
-        if (!this.boxs && this.element) {
+        if (!this.layouted) {
             el = this.element;
-            childs = el.childNodes;
-            for (i=0,l=childs.length; i<l; i++) {
-                box = Util.makeBox(childs[i]);
-                this.addChildBox(box);
-                box.doLayoutR();
+            if (el && !this.boxes) {
+                childs = el.childNodes;
+                for (i=0,l=childs.length; i<l; i++) {
+                    // new box
+                    box = BoxFactory.makeBox(childs[i]);
+                    // do child box layout
+                    box.doLayoutR();
+                    // add relationship
+                    this.addChildBox(box);
+                }
             }
+            this.doLayout();
+            this.layouted = true;
         }
-        this.doLayout();
         return this;
     };
 
     /**
      * box to text
      *
+     * @param {string} sonString
      * @return {string}
      */
-    Klass.prototype.toText = function() {
-        return (this.prefix || '') + (this.text || '') + (this.suffix || '');
+    Klass.prototype.toText = function(sonString) {
+        return (this.prefix || '') + (sonString || '') + (this.suffix || '');
+    };
+
+    /**
+     * box to text recursively
+     *
+     * @return {string}
+     */
+    Klass.prototype.toTextR = function() {
+        var i, l,
+            text = [];
+        if (this.boxes) {
+            for (i=0,l=this.boxes.length; i<l; i++) {
+                text.push(this.boxes[i].toTextR());
+            }
+        }
+        return this.toText(text.join(''));
     };
 
     return Klass;

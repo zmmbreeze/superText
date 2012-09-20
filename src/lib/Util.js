@@ -1,5 +1,6 @@
 /**
- * Base Box Class
+ * Utilities
+ *
  * @author mzhou / @zhoumm
  *
  */
@@ -9,6 +10,7 @@
 
 var Util = (function() {
     'use strict';
+
     var Klass = {},
         upperReg = /([A-Z])/g,
         dashReg = /-([a-z])/g,
@@ -63,30 +65,6 @@ var Util = (function() {
     Klass.isInlineBlock = function(element, nodeName) {
         var display = Util.getComputedStyle(element, 'display');
         return !!(display === 'inline-block' || (display === 'inline' && replacedElement[nodeName]));
-    };
-
-    /**
-     * Factory to generate new Box for element:
-     *      1. block
-     *      2. inline
-     *
-     * @param {object} element jquery object
-     * @return {boolean}
-     */
-    Klass.makeBox = function(element) {
-        var type = Util.isBlock(element) ? 'block' : 'inline';
-        switch(type) {
-        case 'block':
-            box = new BlockBox(element);
-            break;
-        case 'inline':
-            box = new InlineBox(element);
-            break;
-        default:
-            box = new Box();
-            break;
-        }
-        return box;
     };
 
     /**
