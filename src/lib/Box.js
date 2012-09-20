@@ -13,71 +13,47 @@
 
 var Box = (function() {
     'use strict';
-    var ArrayProtoSlice = Array.prototype.slice;
-
-    /**
-     * wrap supr method
-     *
-     * @param {string} method name
-     * @param {object} Father Father/Father.prototype
-     * @param {object} self context
-     * @param {object} args arguments
-     * @param {function} Func caller
-     * @return {function} wrapped supr method
-     *
-     */
-    function wrapSupr(method, Father, self, args, Func) {
-        if (!Func.cache) {
-            Func.cache = {};
-        }
-        var suprMethod = Father[method];
-        if (!suprMethod || typeof suprMethod !== 'function' ) {
-            throw new Error('supr(): First arg must be function name of Father!');
-        }
-
-        var cache = Func.cache;
-        if (!cache[method]) {
-            cache[method] = function() {
-                return suprMethod.apply(self, ArrayProtoSlice.call(args, 0));
-            };
-        }
-        return cache[method];
-    }
 
     function Klass() {}
 
     Klass.extend = function(Son, _Father) {
-        var Father = _Father || this;
+        var Father = _Father || this,
+            suprProtoCache = {},
+            suprStaticCache = {};
         for (var staticMethod in Father) {
-            if (Father.hasOwnProperty(staticMethod) && staticMethod !== 'prototype' && staticMethod !== 'supr') {
+            if (Father.hasOwnProperty(staticMethod) && staticMethod !== 'prototype') {
                 Son[staticMethod] = Father[staticMethod];
             }
         }
         for (var method in Father.prototype) {
-            if (Father.prototype.hasOwnProperty(method) && method !== 'supr') {
-                Son.prototype[method] = Father.prototype[method];
+            if (Father.prototype.hasOwnProperty(method)) {
+                if (typeof Father.prototype[method] === 'function') {
+                    Son.prototype[method] = function() {
+                        var args = ArrayProtoSlice.call(arguments, 0);
+                        args.unshift(wrapSupr(method, Father.prototype, this, arguments, suprProtoCache));
+                        return Father.prototype[method].apply(this, args);
+                    };
+                } else {
+                    Son.prototype[method] = Father.prototype[method];
+                }
             }
         }
-        /**
-         * Use this method to call father's method
-         *
-         * @param {string} method name
-         * @return {function}
-         */
-        Son.prototype.supr = function suprProto(method) {
-            return wrapSupr(method, Father.prototype, this, arguments, suprProto);
-        };
-        /**
-         * Use this method to call father's method
-         *
-         * @param {string} method name
-         * @return {function}
-         */
-        Son.supr = function suprStatic(method) {
-            return wrapSupr(method, Father, this, arguments, suprStatic);
-        };
 
         return Son;
+    };
+
+    Klass.methods = function(o) {
+        var proto = Klass.prototype;
+        for (var method in o) {
+            proto[method] = o[method];
+        }
+    };
+
+    Klass.statics = function(o) {
+        var proto = Klass;
+        for (var method in o) {
+            proto[method] = o[method];
+        }
     };
 
     /**

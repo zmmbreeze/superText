@@ -6,6 +6,38 @@
 </head>
 <body>
 	<script src="src/jquery.1.6.4.js"></script>
+	<script src="src/lib/Klass.js"></script>
+	<script src="src/lib/Util.js"></script>
+	<script src="src/lib/Box.js"></script>
+	<script src="src/lib/BlockBox.js"></script>
+	<script src="src/lib/Line.js"></script>
+	<script src="src/lib/InlineBox.js"></script>
 	<script src="src/jquery.superText.js"></script>
+	<script type="text/javascript">
+	var Father = Klass.extend(function() {});
+	Father.methods({
+		get: function(supr, a) {
+			supr();
+			console.log(this, 'Father get():', arguments);
+		}
+	});
+	var Son = Father.extend(function() {});
+	Son.methods({
+		get: function(supr, a) {
+			supr(a);
+			console.log(this, 'Son get():', arguments);
+		}
+	});
+	var GrandSon = Son.extend(function() {});
+	GrandSon.methods({
+		get: function(supr, a) {
+			supr(a);
+			console.log(this, 'GrandSon get():', arguments);
+		}
+	});
+	new GrandSon().get(1);
+	var GrandGrandSon = GrandSon.extend(function() {});
+	new GrandGrandSon().get(2);
+	</script>
 </body>
 </html>
