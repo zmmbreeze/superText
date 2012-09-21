@@ -16,35 +16,27 @@ var Klass = (function() {
             }
         }
 
+        function make(method, self, o, Father) {
+            return function() {
+                var args = ArrayProtoSlice.call(arguments, 0);
+                args.unshift(Father[method] ? function() {
+                    return Father[method].apply(self, ArrayProtoSlice.call(arguments, 0));
+                } : function() {});
+                return o[method].apply(self, args);
+            };
+        }
+
         Son.methods = function(o) {
             var proto = Son.prototype;
             for (var method in o) {
-                proto[method] = function() {
-                    var args = ArrayProtoSlice.call(arguments, 0);
-                    args.unshift(
-                        Father.prototype[method]
-                            ? function() {
-                                return Father.prototype[method].apply(this, ArrayProtoSlice.call(arguments, 0));
-                              }
-                            : function() {});
-                    o[method].apply(this, args);
-                };
+                proto[method] = make(method, this, o, Father.prototype);
             }
         };
 
         Son.statics = function(o) {
             var proto = Son;
             for (var method in o) {
-                proto[method] = function() {
-                    var args = ArrayProtoSlice.call(arguments, 0);
-                    args.unshift(
-                        Father[method]
-                            ? function() {
-                                return Father[method].apply(this, ArrayProtoSlice.call(arguments, 0));
-                              } 
-                            : function() {});
-                    o[method].apply(this, args);
-                };
+                proto[method] = make(method, this, o, Father);
             }
         };
 

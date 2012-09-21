@@ -1,43 +1,62 @@
 <!DOCTYPE HTML>
 <html lang="en-US">
 <head>
-	<meta charset="UTF-8">
-	<title>jQuery superText</title>
+    <meta charset="UTF-8">
+    <title>jQuery superText</title>
 </head>
 <body>
-	<script src="src/jquery.1.6.4.js"></script>
-	<script src="src/lib/Klass.js"></script>
-	<script src="src/lib/Util.js"></script>
-	<script src="src/lib/Box.js"></script>
-	<script src="src/lib/BlockBox.js"></script>
-	<script src="src/lib/Line.js"></script>
-	<script src="src/lib/InlineBox.js"></script>
-	<script src="src/jquery.superText.js"></script>
-	<script type="text/javascript">
-	var Father = Klass.extend(function() {});
-	Father.methods({
-		get: function(supr, a) {
-			supr();
-			console.log(this, 'Father get():', arguments);
-		}
-	});
-	var Son = Father.extend(function() {});
-	Son.methods({
-		get: function(supr, a) {
-			supr(a);
-			console.log(this, 'Son get():', arguments);
-		}
-	});
-	var GrandSon = Son.extend(function() {});
-	GrandSon.methods({
-		get: function(supr, a) {
-			supr(a);
-			console.log(this, 'GrandSon get():', arguments);
-		}
-	});
-	new GrandSon().get(1);
-	var GrandGrandSon = GrandSon.extend(function() {});
-	new GrandGrandSon().get(2);
-	</script>
+    <script src="src/jquery.1.6.4.js"></script>
+    <script src="src/lib/Klass.js"></script>
+    <script src="src/lib/Util.js"></script>
+    <script src="src/lib/Box.js"></script>
+    <script src="src/lib/BlockBox.js"></script>
+    <script src="src/lib/Line.js"></script>
+    <script src="src/lib/InlineBox.js"></script>
+    <script src="src/jquery.superText.js"></script>
+    <script type="text/javascript">
+    var Father = Klass.extend(function() {});
+    Father.methods({
+        get: function(supr) {
+            supr();
+            console.log(this, 'Father get():', this.a);
+        },
+        set: function(supr, a) {
+            supr(a);
+            this.a = a;
+            console.log('Father set():', a);
+        }
+    });
+    var Son = Father.extend(function() {});
+    Son.methods({
+        get: function(supr) {
+            supr();
+            console.log(this, 'Son get():', this.a);
+        },
+        set: function(supr, a) {
+            supr(a);
+            this.a = a;
+            console.log('Son set():', a);
+        }
+    });
+    var GrandSon = Son.extend(function() {});
+    GrandSon.methods({
+        get: function(supr) {
+            supr();
+            console.log(this, 'GrandSon get():', this.a);
+        },
+        set: function(supr, a) {
+            supr(a);
+            this.a = a;
+            console.log('GrandSon set():', a);
+        }
+    });
+    new GrandSon().get(1);
+    var GrandGrandSon = GrandSon.extend(function() {});
+    new GrandGrandSon().get();
+    // ------------------------
+    var gs = new GrandSon();
+    gs.set(2);
+    gs.get();
+    </script>
 </body>
 </html>
