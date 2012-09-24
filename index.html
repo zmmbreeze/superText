@@ -6,7 +6,7 @@
 </head>
 <body>
     <script src="src/jquery.1.6.4.js"></script>
-    <script src="src/lib/Klass.js"></script>
+    <script src="src/lib/Proto.js"></script>
     <script src="src/lib/Util.js"></script>
     <script src="src/lib/Box.js"></script>
     <script src="src/lib/BlockBox.js"></script>
@@ -14,49 +14,46 @@
     <script src="src/lib/InlineBox.js"></script>
     <script src="src/jquery.superText.js"></script>
     <script type="text/javascript">
-    var Father = Klass.extend(function() {});
-    Father.methods({
-        get: function(supr) {
-            supr();
-            console.log(this, 'Father get():', this.a);
-        },
-        set: function(supr, a) {
-            supr(a);
-            this.a = a;
-            console.log('Father set():', a);
-        }
+    var ClassFather = Proto.$extend();
+    ClassFather.$methods({
+        set: function(supr, v) {this.vCF = v; return this;},
+        get: function(supr) {return this.vCF;},
+        father: function(){}
     });
-    var Son = Father.extend(function() {});
-    Son.methods({
-        get: function(supr) {
-            supr();
-            console.log(this, 'Son get():', this.a);
-        },
-        set: function(supr, a) {
-            supr(a);
-            this.a = a;
-            console.log('Son set():', a);
-        }
+    var getCount = 0,
+        setCount = 0,
+        Class = ClassFather.$extend(function(supr) {
+            supr(this);
+        });
+    Class.$methods('Class', function(){});
+    var Father = Proto.$extend();
+    Father.$methods({
+        set: function(supr, v) {this.vF = v; return this;},
+        get: function(supr) {return this.vF;}
     });
-    var GrandSon = Son.extend(function() {});
-    GrandSon.methods({
+    var Mixined = Father.$extend();
+    Mixined.$methods({
         get: function(supr) {
-            supr();
-            console.log(this, 'GrandSon get():', this.a);
+            supr(this);
+            return this.v;
         },
-        set: function(supr, a) {
-            supr(a);
-            this.a = a;
-            console.log('GrandSon set():', a);
-        }
+        set: function(supr, v) {
+            supr(this, v);
+            this.v = v;
+            return this;
+        },
+        mix: function(){}
     });
-    new GrandSon().get(1);
-    var GrandGrandSon = GrandSon.extend(function() {});
-    new GrandGrandSon().get();
-    // ------------------------
-    var gs = new GrandSon();
-    gs.set(2);
-    gs.get();
+    window.log = true;
+    Class.$mixin(Mixined);
+    window.log = false;
+    var a = new Class();
+    var Son = Class.$extend(function() {
+        this.vSF = 1;
+    });
+    Son.$methods('son', function(){});
+    var b = new Son();
+    console.log(b.$from(Class));
     </script>
 </body>
 </html>
