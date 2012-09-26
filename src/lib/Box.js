@@ -9,86 +9,46 @@
  */
 
 /*jshint undef:true, browser:true, noarg:true, curly:true, regexp:true, newcap:true, trailing:false, noempty:true, regexp:false, strict:true, evil:true, funcscope:true, iterator:true, loopfunc:true, multistr:true, boss:true, eqnull:true, eqeqeq:false, undef:true */
-/*global jQuery:true, BoxFactory:false */
+/*global Proto:false, BoxFactory:false */
 
 var Box = (function() {
     'use strict';
 
-    function Klass() {}
-
-    Klass.extend = function(Son, _Father) {
-        var Father = _Father || this,
-            suprProtoCache = {},
-            suprStaticCache = {};
-        for (var staticMethod in Father) {
-            if (Father.hasOwnProperty(staticMethod) && staticMethod !== 'prototype') {
-                Son[staticMethod] = Father[staticMethod];
-            }
-        }
-        for (var method in Father.prototype) {
-            if (Father.prototype.hasOwnProperty(method)) {
-                if (typeof Father.prototype[method] === 'function') {
-                    Son.prototype[method] = function() {
-                        var args = ArrayProtoSlice.call(arguments, 0);
-                        args.unshift(wrapSupr(method, Father.prototype, this, arguments, suprProtoCache));
-                        return Father.prototype[method].apply(this, args);
-                    };
-                } else {
-                    Son.prototype[method] = Father.prototype[method];
-                }
-            }
-        }
-
-        return Son;
-    };
-
-    Klass.methods = function(o) {
-        var proto = Klass.prototype;
-        for (var method in o) {
-            proto[method] = o[method];
-        }
-    };
-
-    Klass.statics = function(o) {
-        var proto = Klass;
-        for (var method in o) {
-            proto[method] = o[method];
-        }
-    };
+    var Klass = Proto.$extend();
 
     /**
      * whether this box has child box
      * 
      * @return {boolean}
      */
-    Klass.prototype.hasChildBox = function() {
+    Klass.$methods('hasChildBox', function(supr) {
         return this.boxes && this.boxes.length;
-    };
+    });
 
     /**
      * Get lastchild box
      * 
      * @return {object}
      */
-    Klass.prototype.lastChildBox = function() {
+    Klass.$methods('lastChildBox', function(supr) {
         if (this.hasChildBox()) {
             return this.boxes && this.boxes[this.boxes.length-1];
         }
-    };
+    });
 
     /**
      * add child box
      * 
      * @return {object}
      */
-    Klass.prototype.addChildBox = function(box) {
+    Klass.$methods('addChildBox', function(supr, box) {
         if (!this.boxes) {
             this.boxes = [];
         }
         this.boxes.push(box);
         box.parent = this;
         return this;
-    };
+    });
 
     /**
      * do layout for this box:
@@ -98,9 +58,9 @@ var Box = (function() {
      * @param {object} option
      * @return {object}
      */
-    Klass.prototype.doLayout = function(option) {
+    Klass.$methods('doLayout', function(supr, option) {
         return this;
-    };
+    });
 
     /**
      * do layout for this box and it's children recursively:
@@ -114,7 +74,7 @@ var Box = (function() {
      * @param {object} option
      * @return {object}
      */
-    Klass.prototype.doLayoutR = function(option) {
+    Klass.$methods('doLayoutR', function(supr, option) {
         var el, childs, i, l, box;
         if (!this.layouted) {
             el = this.element;
@@ -133,7 +93,7 @@ var Box = (function() {
             this.layouted = true;
         }
         return this;
-    };
+    });
 
     /**
      * box to text
@@ -141,16 +101,16 @@ var Box = (function() {
      * @param {string} sonString
      * @return {string}
      */
-    Klass.prototype.toText = function(sonString) {
+    Klass.$methods('toText', function(supr, sonString) {
         return (this.prefix || '') + (sonString || '') + (this.suffix || '');
-    };
+    });
 
     /**
      * box to text recursively
      *
      * @return {string}
      */
-    Klass.prototype.toTextR = function() {
+    Klass.$methods('toTextR', function(supr) {
         var i, l,
             text = [];
         if (this.boxes) {
@@ -159,7 +119,7 @@ var Box = (function() {
             }
         }
         return this.toText(text.join(''));
-    };
+    });
 
     return Klass;
 })();

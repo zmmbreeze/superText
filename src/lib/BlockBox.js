@@ -15,12 +15,12 @@
  */
 
 /*jshint undef:true, browser:true, noarg:true, curly:true, regexp:true, newcap:true, trailing:false, noempty:true, regexp:false, strict:true, evil:true, funcscope:true, iterator:true, loopfunc:true, multistr:true, boss:true, eqnull:true, eqeqeq:false, undef:true */
-/*global jQuery:true, Box:false, Line:false */
+/*global Box:false, Line:false */
 
 var BlockBox = (function() {
     'use strict';
 
-    var Klass = Box.extend(function(element) {
+    var Klass = Box.$extend(function(supr, element) {
         this.element = element;
         this.type = 'block';
     });
@@ -38,7 +38,7 @@ var BlockBox = (function() {
      *
      * @return {object}
      */
-    Klass.prototype.addChildBox = function(box) {
+    Klass.$methods('addChildBox', function(box) {
         if (!this.boxes) {
             this.boxes = [];
         }
@@ -79,12 +79,12 @@ var BlockBox = (function() {
             break;
         }
         return this;
-    };
+    });
 
-    Klass.prototype.doLayout = function(option) {
+    Klass.$methods('doLayout', function(option) {
         
         return this;
-    };
+    });
 
     return Klass;
 })();

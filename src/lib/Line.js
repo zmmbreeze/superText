@@ -17,18 +17,17 @@ var Line = (function() {
     }
 
 
-    Klass.createEmptyLine = function() {
+    Klass.$statics('createEmptyLine', function(supr) {
         return new Klass();
-    };
+    });
 
-    Klass.prototype.addBox = function(box) {
-
+    Klass.$methods('addBox', function(box) {
 
         return this;
-    };
+    });
 
-    Klass.prototype.toText = function() {
+    Klass.$methods('toText', function() {
 
-    };
+    });
     return Klass;
 })();

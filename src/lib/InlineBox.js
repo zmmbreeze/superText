@@ -11,12 +11,12 @@
 var InlineBox = (function() {
     'use strict';
 
-    var Klass = Box.extend(function(element) {
+    var Klass = Box.$extend(function(supr, element) {
         this.element = element;
         this.type = 'inline';
     });
 
-    Klass.prototype.addChildBox = function(box) {
+    Klass.$method('addChildBox', function(box) {
         if (!this.boxes) {
             this.boxes = [];
         }
@@ -33,12 +33,12 @@ var InlineBox = (function() {
             break;
         }
         return this;
-    };
+    });
 
-    Klass.prototype.doLayout = function(option) {
+    Klass.$method('doLayout', function(option) {
 
         return this;
-    };
+    });
 
     return Klass;
 })();

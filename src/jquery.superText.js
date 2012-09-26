@@ -26,10 +26,10 @@
      * @return {string} text
      */
     $.fn.superText = function(option) {
-        var text = [];
+        var texts = [];
         this.each(function(index, element) {
             texts.push(BoxFactory.rendBox(element, option));
         });
-        return text.join(option.gap || '\n');
+        return texts.join(option.gap || '\n');
     };
 })(jQuery);
