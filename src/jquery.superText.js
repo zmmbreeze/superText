@@ -17,6 +17,8 @@
     //@import "lib/BlockBox.js";
     //@import "lib/InlineBox.js";
     //@import "lib/Line.js";
+    //@import "lib/TextBox.js";
+    //@import "lib/Br.js";
     //@import "lib/BoxFactory.js";
 
 
@@ -26,6 +28,7 @@
      * @return {string} text
      */
     $.fn.superText = function(option) {
+        option = option || {};
         var texts = [];
         this.each(function(index, element) {
             texts.push(BoxFactory.rendBox(element, option));

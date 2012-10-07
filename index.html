@@ -3,8 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <title>jQuery superText</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        margin: 0 auto 50px;
+        width: 90%;
+    }
+    h1, h2 {
+        margin: 30px auto 20px;
+        padding-bottom: 5px;
+        width: 50%;
+        font-size: 24px;
+        font-weight: bold;
+        text-align:center;
+        border-bottom: 1px dotted #CCC;
+    }
+    h1 {
+        margin: 50px auto 100px;
+        width: 80%;
+        font-size: 30px;
+    }
+    .fl {
+        float: left;
+        width: 45%;
+        height: 100%;
+        overflow: scroll;
+    }
+    .fr {
+        float: right;
+        width: 45%;
+        height: 100%;
+    }
+    .pack {
+        overflow: hidden;
+        _zoom: 1;
+    }
+    </style>
 </head>
 <body>
+    <h1>jQuery superText</h1>
+    <h2>Line</h2>
+    <div class="pack" style="height:400px;">
+        <div class="fl html">
+            <div><div>
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </div></div>
+            <br/>
+            <div>
+            <br/>
+            This is a new line.<br/>
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.<br/>
+            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<br/>
+            </div>
+            <div style="white-space: pre-wrap;">
+Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,<br/>
+totam rem aperiam,
+<br/>
+eaque ipsa quae ab illo inventore
+<p>veritatis et quasi architecto</p>
+beatae vitae dicta sunt explicabo.
+            </div>
+        </div>
+        <textarea class="fr view"></textarea>
+    </div>
+
+    
+    <h2>Block element in inline element</h2>
+    <div class="pack">
+        <div class="fl html">
+            <a href="/">
+                Duis aute irure dolor in reprehenderit 
+                <p>in voluptate<br/>velit esse</p>
+                cillum dolore eu fugiat nulla pariatur.
+            </a>
+        </div>
+        <textarea class="fr view"></textarea>
+    </div>
+
     <script src="src/jquery.1.6.4.js"></script>
     <script src="src/lib/Proto.js"></script>
     <script src="src/lib/Util.js"></script>
@@ -12,48 +90,14 @@
     <script src="src/lib/BlockBox.js"></script>
     <script src="src/lib/Line.js"></script>
     <script src="src/lib/InlineBox.js"></script>
+    <script src="src/lib/TextBox.js"></script>
+    <script src="src/lib/Br.js"></script>
+    <script src="src/lib/BoxFactory.js"></script>
     <script src="src/jquery.superText.js"></script>
     <script type="text/javascript">
-    var ClassFather = Proto.$extend();
-    ClassFather.$methods({
-        set: function(supr, v) {this.vCF = v; return this;},
-        get: function(supr) {return this.vCF;},
-        father: function(){}
-    });
-    var getCount = 0,
-        setCount = 0,
-        Class = ClassFather.$extend(function(supr) {
-            supr(this);
+        $('.html').each(function(i, e) {
+            $(e).superText();
         });
-    Class.$methods('Class', function(){});
-    var Father = Proto.$extend();
-    Father.$methods({
-        set: function(supr, v) {this.vF = v; return this;},
-        get: function(supr) {return this.vF;}
-    });
-    var Mixined = Father.$extend();
-    Mixined.$methods({
-        get: function(supr) {
-            supr(this);
-            return this.v;
-        },
-        set: function(supr, v) {
-            supr(this, v);
-            this.v = v;
-            return this;
-        },
-        mix: function(){}
-    });
-    window.log = true;
-    Class.$mixin(Mixined);
-    window.log = false;
-    var a = new Class();
-    var Son = Class.$extend(function() {
-        this.vSF = 1;
-    });
-    Son.$methods('son', function(){});
-    var b = new Son();
-    console.log(b.$from(Class));
     </script>
 </body>
 </html>

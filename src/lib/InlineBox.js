@@ -4,9 +4,9 @@
  * @author mzhou / @zhoumm
  *
  */
- 
+
 /*jshint undef:true, browser:true, noarg:true, curly:true, regexp:true, newcap:true, trailing:false, noempty:true, regexp:false, strict:true, evil:true, funcscope:true, iterator:true, loopfunc:true, multistr:true, boss:true, eqnull:true, eqeqeq:false, undef:true */
-/*global jQuery:true, Box:false */
+/*global jQuery:true, Box:false, Line:false */
 
 var InlineBox = (function() {
     'use strict';
@@ -16,28 +16,33 @@ var InlineBox = (function() {
         this.type = 'inline';
     });
 
-    Klass.$method('addChildBox', function(box) {
+    Klass.$methods('addChildBox', function(supr, box) {
         if (!this.boxes) {
             this.boxes = [];
         }
 
         switch(box.type) {
         case 'block':
-            break;
-        case 'inline':
-            this.boxes.push(box);
-            break;
+            if (!this.parent) {
+                throw new Error('addChildBox(): Inline element has no parent.');
+            }
+            return this.parent.addChildBox(box);
         case 'line':
-            break;
+            if (!this.parent) {
+                throw new Error('addChildBox(): Inline element has no parent.');
+            }
+            return this.parent.addChildBox(box);
+        case 'br':
+            var lastBox;
+            if (!this.parent) {
+                throw new Error('addChildBox(): Inline element has no parent.');
+            }
+            lastBox = new Line();
+            this.parent.addChildBox(lastBox);
+            return lastBox;
         default:
-            break;
+            return supr(this, box);
         }
-        return this;
-    });
-
-    Klass.$method('doLayout', function(option) {
-
-        return this;
     });
 
     return Klass;

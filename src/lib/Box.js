@@ -18,7 +18,7 @@ var Box = (function() {
 
     /**
      * whether this box has child box
-     * 
+     *
      * @return {boolean}
      */
     Klass.$methods('hasChildBox', function(supr) {
@@ -33,6 +33,8 @@ var Box = (function() {
     Klass.$methods('lastChildBox', function(supr) {
         if (this.hasChildBox()) {
             return this.boxes && this.boxes[this.boxes.length-1];
+        } else {
+            return null;
         }
     });
 
@@ -51,14 +53,23 @@ var Box = (function() {
     });
 
     /**
+     * use custom layout
      * do layout for this box:
      *      1. generate text;
      *      2. generate prefix and suffix;
      *
-     * @param {object} option
+     * @param {object} layouts layouts for this box type
      * @return {object}
      */
-    Klass.$methods('doLayout', function(supr, option) {
+    Klass.$methods('doLayout', function(supr, layouts) {
+        var layout, i, l;
+
+        if (layouts) {
+            for (i=0,l=layouts.length; i<l; i++) {
+                layout = layouts[i];
+                layout(this, this.element);
+            }
+        }
         return this;
     });
 
@@ -75,21 +86,23 @@ var Box = (function() {
      * @return {object}
      */
     Klass.$methods('doLayoutR', function(supr, option) {
-        var el, childs, i, l, box;
+        var el, childs, i, l, box, parent;
         if (!this.layouted) {
             el = this.element;
             if (el && !this.boxes) {
                 childs = el.childNodes;
+                parent = this;
                 for (i=0,l=childs.length; i<l; i++) {
                     // new box
                     box = BoxFactory.makeBox(childs[i]);
-                    // do child box layout
-                    box.doLayoutR();
                     // add relationship
-                    this.addChildBox(box);
+                    // may be change parent
+                    parent = parent.addChildBox(box);
+                    // do child box layout
+                    box.doLayoutR(option);
                 }
             }
-            this.doLayout();
+            this.doLayout(option.layouts ? option.layouts[this.type] : null);
             this.layouted = true;
         }
         return this;

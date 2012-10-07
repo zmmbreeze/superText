@@ -26,6 +26,30 @@ var BlockBox = (function() {
     });
 
     /**
+     * add inline box or text or br
+     *
+     * @param {object} parent
+     * @param {object} son
+     */
+    function addInlineBox(parent, son) {
+        var lastBox;
+        if (parent.hasChildBox()) {
+            lastBox = parent.lastChildBox();
+            if (lastBox.type === 'block') {
+                lastBox = new Line();
+                parent.addChildBox(lastBox);
+            }
+        } else {
+            lastBox = new Line();
+            parent.addChildBox(lastBox);
+        }
+        if (son.type !== 'br') {
+            lastBox.addChildBox(son);
+        }
+        return lastBox;
+    }
+
+    /**
      * add child box
      *      if child box type is block,
      *          then add to this box;
@@ -38,52 +62,21 @@ var BlockBox = (function() {
      *
      * @return {object}
      */
-    Klass.$methods('addChildBox', function(box) {
+    Klass.$methods('addChildBox', function(supr, box) {
         if (!this.boxes) {
             this.boxes = [];
         }
 
         switch(box.type) {
-        case 'block':
-            /*var i, l, childBoxes;
-            if (box.hasChildBox()) {
-                childBoxes = box.boxes;
-                for (i=0,l=childBoxes.length; i<l; i++) {
-                    this.addChildBox(childBoxes[i]);
-                }
-            } else {
-                this.addChildBox(new Line());
-            }*/
-            this.supr('addChildBox')(box);
-            break;
         case 'inline':
-            var lastBox;
-            if (this.hasChildBox()) {
-                lastBox = this.lastChildBox();
-                if (lastBox.type === 'box') {
-                    // add new line
-                    lastBox = new Line();
-                    this.addChildBox(lastBox);
-                }
-                lastBox.addChildBox(box);
-            } else {
-                lastBox = new Line();
-                this.addChildBox(lastBox);
-                lastBox.addChildBox(box);
-            }
-            break;
-        case 'line':
-            this.supr('addChildBox')(box);
-            break;
+            return addInlineBox(this, box);
+        case 'br':
+            return addInlineBox(this, box);
+        case 'text':
+            return addInlineBox(this, box);
         default:
-            break;
+            return supr(this, box);
         }
-        return this;
-    });
-
-    Klass.$methods('doLayout', function(option) {
-        
-        return this;
     });
 
     return Klass;
