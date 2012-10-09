@@ -32,9 +32,11 @@ var BoxFactory = (function() {
     });
 
     Klass.$statics('rendBox', function(supr, element, option) {
-        return this.makeBox(element)
-                   .doLayoutR(option)
-                   .toTextR();
+        var r = this.makeBox(element)
+                   .doLayoutR(option);
+                   // .toTextR();
+        console.log(r);
+        return r;
     });
 
     return Klass;

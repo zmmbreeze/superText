@@ -43,10 +43,44 @@ var BlockBox = (function() {
             lastBox = new Line();
             parent.addChildBox(lastBox);
         }
-        if (son.type !== 'br') {
-            lastBox.addChildBox(son);
-        }
+
+        lastBox.addChildBox(son);
         return lastBox;
+    }
+
+    /**
+     * add block box
+     *
+     * @param {object} parent
+     * @param {object} son
+     * @return {object} the parent should for added box's siblings
+     */
+    function addBlockBox(parent, son) {
+        if (son.hasChildBox()) {
+            var i, l, b;
+            for (i=0,l=son.boxes.length; i<l; i++) {
+                parent.addChildBox(son.boxes[i]);
+            }
+            son = null;
+        } else {
+            parent.addChildBox(new Line());
+        }
+        return parent;
+    }
+
+    /**
+     * add br
+     *
+     * @param {object} parent
+     * @param {object} son
+     * @return {object} the parent should for added box's siblings
+     */
+    function addBr(parent, son) {
+        if (parent.hasChildBox()) {
+            return parent;
+        } else {
+            return parent.addChildBox(new Line());
+        }
     }
 
     /**
@@ -60,7 +94,7 @@ var BlockBox = (function() {
      *      if child box type is line,
      *          then add to this box;
      *
-     * @return {object}
+     * @return {object} the parent should for added box's siblings
      */
     Klass.$methods('addChildBox', function(supr, box) {
         if (!this.boxes) {
@@ -68,6 +102,11 @@ var BlockBox = (function() {
         }
 
         switch(box.type) {
+        case 'block':
+            return addBlockBox(this, box);
+        case 'line':
+            supr(this, box);
+            return box;
         case 'inline':
             return addInlineBox(this, box);
         case 'br':

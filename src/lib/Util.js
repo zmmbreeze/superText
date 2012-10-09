@@ -42,7 +42,29 @@ var Util = (function() {
         spaceStyle = {
             'pre': 1,
             'pre-wrap': 1
+        },
+        toString = Object.prototype.toString,
+        // validate html
+        class2type = { // Ideas from jquery, but don't use string and each to make it faster
+            '[object Boolean]': 'boolean',
+            '[object Number]': 'number',
+            '[object String]': 'string',
+            '[object Function]': 'function',
+            '[object Array]': 'array',
+            '[object Date]': 'date',
+            '[object RegExp]': 'regexp',
+            '[object Object]': 'object'
         };
+
+    /**
+     * Get the type of target.
+     *      results: null, undefined, boolean, function, number,
+     *               string, array, date, regexp, object
+     * @param {object} obj everything
+     */
+    Klass.type = function(obj) {
+        return obj == null ? String(obj) : class2type[toString.call(obj)] || 'object';
+    };
 
     /**
      * whether this element generates block box.

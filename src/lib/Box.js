@@ -9,7 +9,7 @@
  */
 
 /*jshint undef:true, browser:true, noarg:true, curly:true, regexp:true, newcap:true, trailing:false, noempty:true, regexp:false, strict:true, evil:true, funcscope:true, iterator:true, loopfunc:true, multistr:true, boss:true, eqnull:true, eqeqeq:false, undef:true */
-/*global Proto:false, BoxFactory:false */
+/*global Proto:false, BoxFactory:false, Util:false */
 
 var Box = (function() {
     'use strict';
@@ -26,8 +26,21 @@ var Box = (function() {
     });
 
     /**
+     * Get firstchild box
+     *
+     * @return {object}
+     */
+    Klass.$methods('firstChildBox', function(supr) {
+        if (this.hasChildBox()) {
+            return this.boxes && this.boxes[0];
+        } else {
+            return null;
+        }
+    });
+
+    /**
      * Get lastchild box
-     * 
+     *
      * @return {object}
      */
     Klass.$methods('lastChildBox', function(supr) {
@@ -95,11 +108,11 @@ var Box = (function() {
                 for (i=0,l=childs.length; i<l; i++) {
                     // new box
                     box = BoxFactory.makeBox(childs[i]);
-                    // add relationship
-                    // may be change parent
-                    parent = parent.addChildBox(box);
                     // do child box layout
                     box.doLayoutR(option);
+                    // add relationship
+                    // may be change parent for it's siblings
+                    parent = parent.addChildBox(box);
                 }
             }
             this.doLayout(option.layouts ? option.layouts[this.type] : null);
@@ -109,13 +122,99 @@ var Box = (function() {
     });
 
     /**
+     * add prefix value
+     * @param {string} text prefix text
+     * @return {object} this
+     */
+    Klass.$methods('addPrefix', function(supr, text) {
+        var type = Util.type(this.prefix),
+            tmp;
+
+        switch (type) {
+        case 'string':
+            tmp = this.prefix;
+            this.prefix = [text, tmp];
+            break;
+        case 'array':
+            this.prefix.unshift(text);
+            break;
+        default:
+            // undefined | null
+            this.prefix = text;
+            break;
+        }
+        return this;
+    });
+
+    /**
+     * get prefix value
+     * @return {string} prefix text
+     */
+    Klass.$methods('getPrefix', function(supr) {
+        var type = Util.type(this.prefix);
+
+        switch (type) {
+        case 'string':
+            return this.prefix;
+        case 'array':
+            return this.prefix.join('');
+        default:
+            // undefined | null
+            return '';
+        }
+    });
+
+    /**
+     * add suffix value
+     * @param {string} text suffix text
+     * @return {object} this
+     */
+    Klass.$methods('addSuffix', function(supr, text) {
+        var type = Util.type(this.prefix),
+            tmp;
+
+        switch (type) {
+        case 'string':
+            tmp = this.prefix;
+            this.prefix = [tmp, text];
+            break;
+        case 'array':
+            this.prefix.push(text);
+            break;
+        default:
+            // undefined | null
+            this.prefix = text;
+            break;
+        }
+        return this;
+    });
+
+    /**
+     * get suffix value
+     * @return {string} suffix text
+     */
+    Klass.$methods('getSuffix', function(supr) {
+        var type = Util.type(this.prefix);
+
+        switch (type) {
+        case 'string':
+            return this.prefix;
+        case 'array':
+            return this.prefix.join('');
+        default:
+            // undefined | null
+            return '';
+        }
+    });
+
+    /**
      * box to text
      *
      * @param {string} sonString
      * @return {string}
      */
     Klass.$methods('toText', function(supr, sonString) {
-        return (this.prefix || '') + (sonString || '') + (this.suffix || '');
+        return this.getPrefix() + (sonString || '') + this.getSuffix();
     });
 
     /**
