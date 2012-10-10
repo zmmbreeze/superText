@@ -96,10 +96,12 @@ var Box = (function() {
      *      2. do layout for this box and return;
      *
      * @param {object} option
-     * @return {object}
+     * @return {object} 
      */
     Klass.$methods('doLayoutR', function(supr, option) {
-        var el, childs, i, l, box, parent;
+        var el, childs, i, l, box, parent,
+            re = this;
+
         if (!this.layouted) {
             el = this.element;
             if (el && !this.boxes) {
@@ -109,16 +111,22 @@ var Box = (function() {
                     // new box
                     box = BoxFactory.makeBox(childs[i]);
                     // do child box layout
-                    box.doLayoutR(option);
+                    // change box, if box has parent
+                    box = box.doLayoutR(option);
                     // add relationship
                     // may be change parent for it's siblings
                     parent = parent.addChildBox(box);
+                }
+                // maybe this box was wrap by another,
+                // when it add child box which it can't contain
+                if (this.parent) {
+                    re = this.parent;
                 }
             }
             this.doLayout(option.layouts ? option.layouts[this.type] : null);
             this.layouted = true;
         }
-        return this;
+        return re;
     });
 
     /**

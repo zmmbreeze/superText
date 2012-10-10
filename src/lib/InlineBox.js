@@ -6,7 +6,7 @@
  */
 
 /*jshint undef:true, browser:true, noarg:true, curly:true, regexp:true, newcap:true, trailing:false, noempty:true, regexp:false, strict:true, evil:true, funcscope:true, iterator:true, loopfunc:true, multistr:true, boss:true, eqnull:true, eqeqeq:false, undef:true */
-/*global jQuery:true, Box:false, Line:false */
+/*global jQuery:true, Box:false, Line:false, BlockBox:false */
 
 var InlineBox = (function() {
     'use strict';
@@ -14,6 +14,18 @@ var InlineBox = (function() {
     var Klass = Box.$extend(function(supr, element) {
         this.element = element;
         this.type = 'inline';
+    });
+
+    /**
+     * create a empty block to wrap this inline block
+     *
+     * @param {object} wrapper
+     * @return {object} this
+     */
+    Klass.$methods('wrap', function(supr, wrapper) {
+        wrapper = wrapper || BlockBox.createEmptyBlock();
+        wrapper.addChildBox(this);
+        return this;
     });
 
     Klass.$methods('addChildBox', function(supr, box) {
@@ -24,24 +36,28 @@ var InlineBox = (function() {
         switch(box.type) {
         case 'block':
             if (!this.parent) {
-                throw new Error('addChildBox(): Inline element has no parent.');
+                this.wrap();
             }
-            return this.parent.addChildBox(box);
+            // block box add this block
+            return this.parent.parent.addChildBox(box);
         case 'line':
             if (!this.parent) {
-                throw new Error('addChildBox(): Inline element has no parent.');
+                this.wrap();
             }
-            return this.parent.addChildBox(box);
+            // block box add this block
+            return this.parent.parent.addChildBox(box);
         case 'br':
-            var lastBox;
             if (!this.parent) {
-                throw new Error('addChildBox(): Inline element has no parent.');
+                this.wrap();
             }
-            lastBox = new Line();
-            this.parent.addChildBox(lastBox);
-            return lastBox;
+            // line box add this block
+            return this.parent.addChildBox(box);
         default:
-            return supr(this, box);
+            if (!this.parent) {
+                this.wrap();
+            }
+            // line box add this block
+            return this.parent.addChildBox(box);
         }
     });
 

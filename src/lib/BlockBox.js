@@ -118,6 +118,17 @@ var BlockBox = (function() {
         }
     });
 
+    /**
+     * create a empty block
+     *
+     * @return {object} empty block
+     */
+    Klass.$statics('createEmptyBlock', function(supr) {
+        var empty = new BlockBox();
+        empty.isEmpty = true;
+        return empty;
+    });
+
     return Klass;
 })();
 
